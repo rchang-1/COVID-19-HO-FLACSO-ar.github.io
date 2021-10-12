@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Análisis Temporal</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/united.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.3/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.9.4.1/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-1.57.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-1.57.1/plotly-latest.min.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Dr. Roberto Enrique Chang Lopez / rchang@unah.edu.hn</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Curvas-COVID-HO.html">Curvas-COVID-HO</a>
+</li>
+<li>
+  <a href="Piramide_Poblacional.html">Piramide Poblacional</a>
+</li>
+<li>
+  <a href="analisis_temporal.html">Análisis Temporal</a>
+</li>
+<li>
+  <a href="Mapas-COVID-HO.html">Mapas COVID-HO</a>
+</li>
+<li>
+  <a href="geoestadistica.html">Geoestadística COVID-HO</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Análisis Temporal</h1>
+
+</div>
+
+
+<p>Visita la página Web: <a href="https://datascience-machinelearning-solutions.github.io/homepage-ho.github.io/" class="uri">https://datascience-machinelearning-solutions.github.io/homepage-ho.github.io/</a></p>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div id="htmlwidget-2c07ffac4d4007950229" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-2c07ffac4d4007950229">{"x":{"data":[{"x":[18351,18356,18361,18366,18368,18370,18371,18372,18373,18374,18375,18376,18378,18381,18382,18384,18385,18386,18388,18389,18390,18391,18394,18395,18396,18397,18398,18399,18400,18401,18402,18403,18404,18405,18406,18407,18408,18409,18410,18411,18412,18413,18414,18415,18416,18417,18418,18419,18420,18421,18422,18423,18424,18425,18426,18427,18428,18429,18430,18431,18432,18433,18434,18435,18436,18437,18438,18439,18440,18441,18442,18443,18444,18445,18446,18447,18448,18449,18450,18451,18452,18453,18454,18455,18456,18457,18458,18459,18460,18461,18462,18463,18464,18465,18466,18467,18468,18469,18470,18471,18472,18473,18474,18475,18476,18477,18478,18479,18480,18481,18482,18483,18484,18485,18486,18487,18488,18489,18490,18491,18492,18493,18494,18495,18496,18497,18498,18499,18500,18501,18502,18503,18504,18505,18506,18507,18508,18509,18510,18511,18512,18513,18514,18515,18516,18517,18518,18519,18521,18522,18523,18524,18525,18526,18527,18528,18529,18530,18531,18532,18533,18534,18535,18536,18537,18538,18539,18540,18541,18542,18543,18544,18545,18546,18547,18548,18549,18550,18551,18552,18553,18554,18555,18556,18557,18558,18559,18560,18561,18562,18563,18564,18565,18566,18567,18568,18569,18570,18571,18572,18573,18574,18575,18576,18577,18578,18579,18580,18581,18582,18583,18585,18586,18587,18588,18589,18590,18591,18592,18593,18594,18595,18596,18597,18598,18599,18600,18601,18602,18603,18604,18605,18606,18607,18608,18609,18610,18611,18612,18613,18614,18615,18616,18617,18618,18619,18620,18621,18622,18623,18624,18625,18626,18627,18629,18642,18644,18645,18646,18647,18648,18649,18650,18651,18652,18653,18654,18655,18656,18657,18658,18659,18660,18661,18662,18663,18664,18665,18666,18667,18668,18669,18670,18671,18673,18674,18675,18676,18677,18678,18679,18680,18681,18682,18683,18684,18685,18686,18687,18688,18689,18690,18691,18692,18694,18695,18696,18697,18698,18700,18701,18702,18703,18704,18705,18708,18709,18710,18711,18712,18713,18714,18716,18717,18718,18721,18722,18723,18724,18725,18726,18727,18728,18729,18730,18731,18732,18733,18735,18737,18738,18739,18740,18741,18742,18743,18744,18745,18746,18747,18748,18749,18750,18751,18752,18753,18754,18755,18757,18758,18759,18761,18762,18763,18764,18765,18766,18767,18768,18769,18771,18772,18773,18774,18776,18777,18778,18779,18780,18781,18782,18783,18784,18785,18786,18787,18788,18789,18790,18792,18793,18794,18795,18796,18797,18798,18799,18800,18801,18802,18803,18804,18806,18807,18808,18809],"y":[3,3,1,2,1,4,9,4,1,1,35,5,4,6,33,4,2,4,10,22,38,11,3,5,26,16,11,55,21,9,6,42,42,16,13,5,20,13,13,9,8,1,12,14,54,31,29,20,15,28,47,22,28,7,50,73,58,50,41,63,35,61,18,69,99,85,54,78,89,108,86,99,63,67,60,137,103,95,52,84,58,71,51,56,166,164,92,41,145,96,140,104,239,171,133,159,106,209,117,64,178,162,111,140,100,60,67,195,109,130,73,169,52,156,140,87,96,127,84,111,211,206,215,189,178,83,24,568,45,417,490,80,86,154,34,717,471,730,767,303,410,445,791,513,1036,1087,173,614,1496,694,472,661,255,546,619,792,558,1148,360,286,583,426,539,595,461,209,118,463,363,459,499,647,195,81,202,558,218,1109,447,116,302,434,532,411,791,565,169,130,540,297,293,678,325,250,308,429,732,305,421,35,206,144,218,330,350,211,168,150,255,274,167,743,308,75,267,141,205,185,348,222,62,42,393,483,321,76,143,215,145,325,563,543,61,296,166,68,210,704,553,554,503,198,67,37,142,360,627,154,117,253,506,117,114,242,412,5,76,33,35,17,175,18,38,21,8,120,72,66,86,38,14,106,155,150,172,131,198,32,119,32,152,871,162,17,176,125,147,303,247,438,72,103,110,97,437,448,574,66,196,194,336,391,270,89,96,199,66,150,152,26,47,167,27,89,97,72,281,477,492,600,357,604,656,88,576,65,90,225,611,460,474,320,243,149,136,49,84,21,104,107,574,411,100,8,140,135,313,13,377,106,183,290,197,57,575,658,577,222,257,334,214,362,12,41,318,166,37,270,113,119,100,36,245,217,166,171,329,390,505,97,96,69,104,231,37,131,753,562,300,1160,1224,563,78,279,182,78,134,81,71,173,66,57,6,87,51,18],"text":["Fecha: 2020-03-30<br />cantidad:    3","Fecha: 2020-04-04<br />cantidad:    3","Fecha: 2020-04-09<br />cantidad:    1","Fecha: 2020-04-14<br />cantidad:    2","Fecha: 2020-04-16<br />cantidad:    1","Fecha: 2020-04-18<br />cantidad:    4","Fecha: 2020-04-19<br />cantidad:    9","Fecha: 2020-04-20<br />cantidad:    4","Fecha: 2020-04-21<br />cantidad:    1","Fecha: 2020-04-22<br />cantidad:    1","Fecha: 2020-04-23<br />cantidad:   35","Fecha: 2020-04-24<br />cantidad:    5","Fecha: 2020-04-26<br />cantidad:    4","Fecha: 2020-04-29<br />cantidad:    6","Fecha: 2020-04-30<br />cantidad:   33","Fecha: 2020-05-02<br />cantidad:    4","Fecha: 2020-05-03<br />cantidad:    2","Fecha: 2020-05-04<br />cantidad:    4","Fecha: 2020-05-06<br />cantidad:   10","Fecha: 2020-05-07<br />cantidad:   22","Fecha: 2020-05-08<br />cantidad:   38","Fecha: 2020-05-09<br />cantidad:   11","Fecha: 2020-05-12<br />cantidad:    3","Fecha: 2020-05-13<br />cantidad:    5","Fecha: 2020-05-14<br />cantidad:   26","Fecha: 2020-05-15<br />cantidad:   16","Fecha: 2020-05-16<br />cantidad:   11","Fecha: 2020-05-17<br />cantidad:   55","Fecha: 2020-05-18<br />cantidad:   21","Fecha: 2020-05-19<br />cantidad:    9","Fecha: 2020-05-20<br />cantidad:    6","Fecha: 2020-05-21<br />cantidad:   42","Fecha: 2020-05-22<br />cantidad:   42","Fecha: 2020-05-23<br />cantidad:   16","Fecha: 2020-05-24<br />cantidad:   13","Fecha: 2020-05-25<br />cantidad:    5","Fecha: 2020-05-26<br />cantidad:   20","Fecha: 2020-05-27<br />cantidad:   13","Fecha: 2020-05-28<br />cantidad:   13","Fecha: 2020-05-29<br />cantidad:    9","Fecha: 2020-05-30<br />cantidad:    8","Fecha: 2020-05-31<br />cantidad:    1","Fecha: 2020-06-01<br />cantidad:   12","Fecha: 2020-06-02<br />cantidad:   14","Fecha: 2020-06-03<br />cantidad:   54","Fecha: 2020-06-04<br />cantidad:   31","Fecha: 2020-06-05<br />cantidad:   29","Fecha: 2020-06-06<br />cantidad:   20","Fecha: 2020-06-07<br />cantidad:   15","Fecha: 2020-06-08<br />cantidad:   28","Fecha: 2020-06-09<br />cantidad:   47","Fecha: 2020-06-10<br />cantidad:   22","Fecha: 2020-06-11<br />cantidad:   28","Fecha: 2020-06-12<br />cantidad:    7","Fecha: 2020-06-13<br />cantidad:   50","Fecha: 2020-06-14<br />cantidad:   73","Fecha: 2020-06-15<br />cantidad:   58","Fecha: 2020-06-16<br />cantidad:   50","Fecha: 2020-06-17<br />cantidad:   41","Fecha: 2020-06-18<br />cantidad:   63","Fecha: 2020-06-19<br />cantidad:   35","Fecha: 2020-06-20<br />cantidad:   61","Fecha: 2020-06-21<br />cantidad:   18","Fecha: 2020-06-22<br />cantidad:   69","Fecha: 2020-06-23<br />cantidad:   99","Fecha: 2020-06-24<br />cantidad:   85","Fecha: 2020-06-25<br />cantidad:   54","Fecha: 2020-06-26<br />cantidad:   78","Fecha: 2020-06-27<br />cantidad:   89","Fecha: 2020-06-28<br />cantidad:  108","Fecha: 2020-06-29<br />cantidad:   86","Fecha: 2020-06-30<br />cantidad:   99","Fecha: 2020-07-01<br />cantidad:   63","Fecha: 2020-07-02<br />cantidad:   67","Fecha: 2020-07-03<br />cantidad:   60","Fecha: 2020-07-04<br />cantidad:  137","Fecha: 2020-07-05<br />cantidad:  103","Fecha: 2020-07-06<br />cantidad:   95","Fecha: 2020-07-07<br />cantidad:   52","Fecha: 2020-07-08<br />cantidad:   84","Fecha: 2020-07-09<br />cantidad:   58","Fecha: 2020-07-10<br />cantidad:   71","Fecha: 2020-07-11<br />cantidad:   51","Fecha: 2020-07-12<br />cantidad:   56","Fecha: 2020-07-13<br />cantidad:  166","Fecha: 2020-07-14<br />cantidad:  164","Fecha: 2020-07-15<br />cantidad:   92","Fecha: 2020-07-16<br />cantidad:   41","Fecha: 2020-07-17<br />cantidad:  145","Fecha: 2020-07-18<br />cantidad:   96","Fecha: 2020-07-19<br />cantidad:  140","Fecha: 2020-07-20<br />cantidad:  104","Fecha: 2020-07-21<br />cantidad:  239","Fecha: 2020-07-22<br />cantidad:  171","Fecha: 2020-07-23<br />cantidad:  133","Fecha: 2020-07-24<br />cantidad:  159","Fecha: 2020-07-25<br />cantidad:  106","Fecha: 2020-07-26<br />cantidad:  209","Fecha: 2020-07-27<br />cantidad:  117","Fecha: 2020-07-28<br />cantidad:   64","Fecha: 2020-07-29<br />cantidad:  178","Fecha: 2020-07-30<br />cantidad:  162","Fecha: 2020-07-31<br />cantidad:  111","Fecha: 2020-08-01<br />cantidad:  140","Fecha: 2020-08-02<br />cantidad:  100","Fecha: 2020-08-03<br />cantidad:   60","Fecha: 2020-08-04<br />cantidad:   67","Fecha: 2020-08-05<br />cantidad:  195","Fecha: 2020-08-06<br />cantidad:  109","Fecha: 2020-08-07<br />cantidad:  130","Fecha: 2020-08-08<br />cantidad:   73","Fecha: 2020-08-09<br />cantidad:  169","Fecha: 2020-08-10<br />cantidad:   52","Fecha: 2020-08-11<br />cantidad:  156","Fecha: 2020-08-12<br />cantidad:  140","Fecha: 2020-08-13<br />cantidad:   87","Fecha: 2020-08-14<br />cantidad:   96","Fecha: 2020-08-15<br />cantidad:  127","Fecha: 2020-08-16<br />cantidad:   84","Fecha: 2020-08-17<br />cantidad:  111","Fecha: 2020-08-18<br />cantidad:  211","Fecha: 2020-08-19<br />cantidad:  206","Fecha: 2020-08-20<br />cantidad:  215","Fecha: 2020-08-21<br />cantidad:  189","Fecha: 2020-08-22<br />cantidad:  178","Fecha: 2020-08-23<br />cantidad:   83","Fecha: 2020-08-24<br />cantidad:   24","Fecha: 2020-08-25<br />cantidad:  568","Fecha: 2020-08-26<br />cantidad:   45","Fecha: 2020-08-27<br />cantidad:  417","Fecha: 2020-08-28<br />cantidad:  490","Fecha: 2020-08-29<br />cantidad:   80","Fecha: 2020-08-30<br />cantidad:   86","Fecha: 2020-08-31<br />cantidad:  154","Fecha: 2020-09-01<br />cantidad:   34","Fecha: 2020-09-02<br />cantidad:  717","Fecha: 2020-09-03<br />cantidad:  471","Fecha: 2020-09-04<br />cantidad:  730","Fecha: 2020-09-05<br />cantidad:  767","Fecha: 2020-09-06<br />cantidad:  303","Fecha: 2020-09-07<br />cantidad:  410","Fecha: 2020-09-08<br />cantidad:  445","Fecha: 2020-09-09<br />cantidad:  791","Fecha: 2020-09-10<br />cantidad:  513","Fecha: 2020-09-11<br />cantidad: 1036","Fecha: 2020-09-12<br />cantidad: 1087","Fecha: 2020-09-13<br />cantidad:  173","Fecha: 2020-09-14<br />cantidad:  614","Fecha: 2020-09-16<br />cantidad: 1496","Fecha: 2020-09-17<br />cantidad:  694","Fecha: 2020-09-18<br />cantidad:  472","Fecha: 2020-09-19<br />cantidad:  661","Fecha: 2020-09-20<br />cantidad:  255","Fecha: 2020-09-21<br />cantidad:  546","Fecha: 2020-09-22<br />cantidad:  619","Fecha: 2020-09-23<br />cantidad:  792","Fecha: 2020-09-24<br />cantidad:  558","Fecha: 2020-09-25<br />cantidad: 1148","Fecha: 2020-09-26<br />cantidad:  360","Fecha: 2020-09-27<br />cantidad:  286","Fecha: 2020-09-28<br />cantidad:  583","Fecha: 2020-09-29<br />cantidad:  426","Fecha: 2020-09-30<br />cantidad:  539","Fecha: 2020-10-01<br />cantidad:  595","Fecha: 2020-10-02<br />cantidad:  461","Fecha: 2020-10-03<br />cantidad:  209","Fecha: 2020-10-04<br />cantidad:  118","Fecha: 2020-10-05<br />cantidad:  463","Fecha: 2020-10-06<br />cantidad:  363","Fecha: 2020-10-07<br />cantidad:  459","Fecha: 2020-10-08<br />cantidad:  499","Fecha: 2020-10-09<br />cantidad:  647","Fecha: 2020-10-10<br />cantidad:  195","Fecha: 2020-10-11<br />cantidad:   81","Fecha: 2020-10-12<br />cantidad:  202","Fecha: 2020-10-13<br />cantidad:  558","Fecha: 2020-10-14<br />cantidad:  218","Fecha: 2020-10-15<br />cantidad: 1109","Fecha: 2020-10-16<br />cantidad:  447","Fecha: 2020-10-17<br />cantidad:  116","Fecha: 2020-10-18<br />cantidad:  302","Fecha: 2020-10-19<br />cantidad:  434","Fecha: 2020-10-20<br />cantidad:  532","Fecha: 2020-10-21<br />cantidad:  411","Fecha: 2020-10-22<br />cantidad:  791","Fecha: 2020-10-23<br />cantidad:  565","Fecha: 2020-10-24<br />cantidad:  169","Fecha: 2020-10-25<br />cantidad:  130","Fecha: 2020-10-26<br />cantidad:  540","Fecha: 2020-10-27<br />cantidad:  297","Fecha: 2020-10-28<br />cantidad:  293","Fecha: 2020-10-29<br />cantidad:  678","Fecha: 2020-10-30<br />cantidad:  325","Fecha: 2020-10-31<br />cantidad:  250","Fecha: 2020-11-01<br />cantidad:  308","Fecha: 2020-11-02<br />cantidad:  429","Fecha: 2020-11-03<br />cantidad:  732","Fecha: 2020-11-04<br />cantidad:  305","Fecha: 2020-11-05<br />cantidad:  421","Fecha: 2020-11-06<br />cantidad:   35","Fecha: 2020-11-07<br />cantidad:  206","Fecha: 2020-11-08<br />cantidad:  144","Fecha: 2020-11-09<br />cantidad:  218","Fecha: 2020-11-10<br />cantidad:  330","Fecha: 2020-11-11<br />cantidad:  350","Fecha: 2020-11-12<br />cantidad:  211","Fecha: 2020-11-13<br />cantidad:  168","Fecha: 2020-11-14<br />cantidad:  150","Fecha: 2020-11-15<br />cantidad:  255","Fecha: 2020-11-16<br />cantidad:  274","Fecha: 2020-11-17<br />cantidad:  167","Fecha: 2020-11-19<br />cantidad:  743","Fecha: 2020-11-20<br />cantidad:  308","Fecha: 2020-11-21<br />cantidad:   75","Fecha: 2020-11-22<br />cantidad:  267","Fecha: 2020-11-23<br />cantidad:  141","Fecha: 2020-11-24<br />cantidad:  205","Fecha: 2020-11-25<br />cantidad:  185","Fecha: 2020-11-26<br />cantidad:  348","Fecha: 2020-11-27<br />cantidad:  222","Fecha: 2020-11-28<br />cantidad:   62","Fecha: 2020-11-29<br />cantidad:   42","Fecha: 2020-11-30<br />cantidad:  393","Fecha: 2020-12-01<br />cantidad:  483","Fecha: 2020-12-02<br />cantidad:  321","Fecha: 2020-12-03<br />cantidad:   76","Fecha: 2020-12-04<br />cantidad:  143","Fecha: 2020-12-05<br />cantidad:  215","Fecha: 2020-12-06<br />cantidad:  145","Fecha: 2020-12-07<br />cantidad:  325","Fecha: 2020-12-08<br />cantidad:  563","Fecha: 2020-12-09<br />cantidad:  543","Fecha: 2020-12-10<br />cantidad:   61","Fecha: 2020-12-11<br />cantidad:  296","Fecha: 2020-12-12<br />cantidad:  166","Fecha: 2020-12-13<br />cantidad:   68","Fecha: 2020-12-14<br />cantidad:  210","Fecha: 2020-12-15<br />cantidad:  704","Fecha: 2020-12-16<br />cantidad:  553","Fecha: 2020-12-17<br />cantidad:  554","Fecha: 2020-12-18<br />cantidad:  503","Fecha: 2020-12-19<br />cantidad:  198","Fecha: 2020-12-20<br />cantidad:   67","Fecha: 2020-12-21<br />cantidad:   37","Fecha: 2020-12-22<br />cantidad:  142","Fecha: 2020-12-23<br />cantidad:  360","Fecha: 2020-12-24<br />cantidad:  627","Fecha: 2020-12-25<br />cantidad:  154","Fecha: 2020-12-26<br />cantidad:  117","Fecha: 2020-12-27<br />cantidad:  253","Fecha: 2020-12-28<br />cantidad:  506","Fecha: 2020-12-29<br />cantidad:  117","Fecha: 2020-12-30<br />cantidad:  114","Fecha: 2020-12-31<br />cantidad:  242","Fecha: 2021-01-02<br />cantidad:  412","Fecha: 2021-01-15<br />cantidad:    5","Fecha: 2021-01-17<br />cantidad:   76","Fecha: 2021-01-18<br />cantidad:   33","Fecha: 2021-01-19<br />cantidad:   35","Fecha: 2021-01-20<br />cantidad:   17","Fecha: 2021-01-21<br />cantidad:  175","Fecha: 2021-01-22<br />cantidad:   18","Fecha: 2021-01-23<br />cantidad:   38","Fecha: 2021-01-24<br />cantidad:   21","Fecha: 2021-01-25<br />cantidad:    8","Fecha: 2021-01-26<br />cantidad:  120","Fecha: 2021-01-27<br />cantidad:   72","Fecha: 2021-01-28<br />cantidad:   66","Fecha: 2021-01-29<br />cantidad:   86","Fecha: 2021-01-30<br />cantidad:   38","Fecha: 2021-01-31<br />cantidad:   14","Fecha: 2021-02-01<br />cantidad:  106","Fecha: 2021-02-02<br />cantidad:  155","Fecha: 2021-02-03<br />cantidad:  150","Fecha: 2021-02-04<br />cantidad:  172","Fecha: 2021-02-05<br />cantidad:  131","Fecha: 2021-02-06<br />cantidad:  198","Fecha: 2021-02-07<br />cantidad:   32","Fecha: 2021-02-08<br />cantidad:  119","Fecha: 2021-02-09<br />cantidad:   32","Fecha: 2021-02-10<br />cantidad:  152","Fecha: 2021-02-11<br />cantidad:  871","Fecha: 2021-02-12<br />cantidad:  162","Fecha: 2021-02-13<br />cantidad:   17","Fecha: 2021-02-15<br />cantidad:  176","Fecha: 2021-02-16<br />cantidad:  125","Fecha: 2021-02-17<br />cantidad:  147","Fecha: 2021-02-18<br />cantidad:  303","Fecha: 2021-02-19<br />cantidad:  247","Fecha: 2021-02-20<br />cantidad:  438","Fecha: 2021-02-21<br />cantidad:   72","Fecha: 2021-02-22<br />cantidad:  103","Fecha: 2021-02-23<br />cantidad:  110","Fecha: 2021-02-24<br />cantidad:   97","Fecha: 2021-02-25<br />cantidad:  437","Fecha: 2021-02-26<br />cantidad:  448","Fecha: 2021-02-27<br />cantidad:  574","Fecha: 2021-02-28<br />cantidad:   66","Fecha: 2021-03-01<br />cantidad:  196","Fecha: 2021-03-02<br />cantidad:  194","Fecha: 2021-03-03<br />cantidad:  336","Fecha: 2021-03-04<br />cantidad:  391","Fecha: 2021-03-05<br />cantidad:  270","Fecha: 2021-03-06<br />cantidad:   89","Fecha: 2021-03-08<br />cantidad:   96","Fecha: 2021-03-09<br />cantidad:  199","Fecha: 2021-03-10<br />cantidad:   66","Fecha: 2021-03-11<br />cantidad:  150","Fecha: 2021-03-12<br />cantidad:  152","Fecha: 2021-03-14<br />cantidad:   26","Fecha: 2021-03-15<br />cantidad:   47","Fecha: 2021-03-16<br />cantidad:  167","Fecha: 2021-03-17<br />cantidad:   27","Fecha: 2021-03-18<br />cantidad:   89","Fecha: 2021-03-19<br />cantidad:   97","Fecha: 2021-03-22<br />cantidad:   72","Fecha: 2021-03-23<br />cantidad:  281","Fecha: 2021-03-24<br />cantidad:  477","Fecha: 2021-03-25<br />cantidad:  492","Fecha: 2021-03-26<br />cantidad:  600","Fecha: 2021-03-27<br />cantidad:  357","Fecha: 2021-03-28<br />cantidad:  604","Fecha: 2021-03-30<br />cantidad:  656","Fecha: 2021-03-31<br />cantidad:   88","Fecha: 2021-04-01<br />cantidad:  576","Fecha: 2021-04-04<br />cantidad:   65","Fecha: 2021-04-05<br />cantidad:   90","Fecha: 2021-04-06<br />cantidad:  225","Fecha: 2021-04-07<br />cantidad:  611","Fecha: 2021-04-08<br />cantidad:  460","Fecha: 2021-04-09<br />cantidad:  474","Fecha: 2021-04-10<br />cantidad:  320","Fecha: 2021-04-11<br />cantidad:  243","Fecha: 2021-04-12<br />cantidad:  149","Fecha: 2021-04-13<br />cantidad:  136","Fecha: 2021-04-14<br />cantidad:   49","Fecha: 2021-04-15<br />cantidad:   84","Fecha: 2021-04-16<br />cantidad:   21","Fecha: 2021-04-18<br />cantidad:  104","Fecha: 2021-04-20<br />cantidad:  107","Fecha: 2021-04-21<br />cantidad:  574","Fecha: 2021-04-22<br />cantidad:  411","Fecha: 2021-04-23<br />cantidad:  100","Fecha: 2021-04-24<br />cantidad:    8","Fecha: 2021-04-25<br />cantidad:  140","Fecha: 2021-04-26<br />cantidad:  135","Fecha: 2021-04-27<br />cantidad:  313","Fecha: 2021-04-28<br />cantidad:   13","Fecha: 2021-04-29<br />cantidad:  377","Fecha: 2021-04-30<br />cantidad:  106","Fecha: 2021-05-01<br />cantidad:  183","Fecha: 2021-05-02<br />cantidad:  290","Fecha: 2021-05-03<br />cantidad:  197","Fecha: 2021-05-04<br />cantidad:   57","Fecha: 2021-05-05<br />cantidad:  575","Fecha: 2021-05-06<br />cantidad:  658","Fecha: 2021-05-07<br />cantidad:  577","Fecha: 2021-05-08<br />cantidad:  222","Fecha: 2021-05-10<br />cantidad:  257","Fecha: 2021-05-11<br />cantidad:  334","Fecha: 2021-05-12<br />cantidad:  214","Fecha: 2021-05-14<br />cantidad:  362","Fecha: 2021-05-15<br />cantidad:   12","Fecha: 2021-05-16<br />cantidad:   41","Fecha: 2021-05-17<br />cantidad:  318","Fecha: 2021-05-18<br />cantidad:  166","Fecha: 2021-05-19<br />cantidad:   37","Fecha: 2021-05-20<br />cantidad:  270","Fecha: 2021-05-21<br />cantidad:  113","Fecha: 2021-05-22<br />cantidad:  119","Fecha: 2021-05-24<br />cantidad:  100","Fecha: 2021-05-25<br />cantidad:   36","Fecha: 2021-05-26<br />cantidad:  245","Fecha: 2021-05-27<br />cantidad:  217","Fecha: 2021-05-29<br />cantidad:  166","Fecha: 2021-05-30<br />cantidad:  171","Fecha: 2021-05-31<br />cantidad:  329","Fecha: 2021-06-01<br />cantidad:  390","Fecha: 2021-06-02<br />cantidad:  505","Fecha: 2021-06-03<br />cantidad:   97","Fecha: 2021-06-04<br />cantidad:   96","Fecha: 2021-06-05<br />cantidad:   69","Fecha: 2021-06-06<br />cantidad:  104","Fecha: 2021-06-07<br />cantidad:  231","Fecha: 2021-06-08<br />cantidad:   37","Fecha: 2021-06-09<br />cantidad:  131","Fecha: 2021-06-10<br />cantidad:  753","Fecha: 2021-06-11<br />cantidad:  562","Fecha: 2021-06-12<br />cantidad:  300","Fecha: 2021-06-14<br />cantidad: 1160","Fecha: 2021-06-15<br />cantidad: 1224","Fecha: 2021-06-16<br />cantidad:  563","Fecha: 2021-06-17<br />cantidad:   78","Fecha: 2021-06-18<br />cantidad:  279","Fecha: 2021-06-19<br />cantidad:  182","Fecha: 2021-06-20<br />cantidad:   78","Fecha: 2021-06-21<br />cantidad:  134","Fecha: 2021-06-22<br />cantidad:   81","Fecha: 2021-06-23<br />cantidad:   71","Fecha: 2021-06-24<br />cantidad:  173","Fecha: 2021-06-25<br />cantidad:   66","Fecha: 2021-06-26<br />cantidad:   57","Fecha: 2021-06-28<br />cantidad:    6","Fecha: 2021-06-29<br />cantidad:   87","Fecha: 2021-06-30<br />cantidad:   51","Fecha: 2021-07-01<br />cantidad:   18"],"type":"scatter","mode":"lines","line":{"width":1.88976377952756,"color":"rgba(0,0,0,1)","dash":"solid"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":43.7625570776256,"r":7.30593607305936,"b":40.1826484018265,"l":48.9497716894977},"plot_bgcolor":"rgba(235,235,235,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187},"title":{"text":"Cantidad de Recuperados en Honduras hasta el 1 de julio 2021","font":{"color":"rgba(0,0,0,1)","family":"","size":17.5342465753425},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[18328.1,18831.9],"tickmode":"array","ticktext":["abr. 2020","may. 2020","jun. 2020","jul. 2020","ago. 2020","sep. 2020","oct. 2020","nov. 2020","dic. 2020","ene. 2021","feb. 2021","mar. 2021","abr. 2021","may. 2021","jun. 2021","jul. 2021"],"tickvals":[18353,18383,18414,18444,18475,18506,18536,18567,18597,18628,18659,18687,18718,18748,18779,18809],"categoryorder":"array","categoryarray":["abr. 2020","may. 2020","jun. 2020","jul. 2020","ago. 2020","sep. 2020","oct. 2020","nov. 2020","dic. 2020","ene. 2021","feb. 2021","mar. 2021","abr. 2021","may. 2021","jun. 2021","jul. 2021"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-60,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"y","title":{"text":"Fecha","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-73.75,1570.75],"tickmode":"array","ticktext":["0","500","1000","1500"],"tickvals":[0,500,1000,1500],"categoryorder":"array","categoryarray":["0","500","1000","1500"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.65296803652968,"tickwidth":0.66417600664176,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.689497716895},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(255,255,255,1)","gridwidth":0.66417600664176,"zeroline":false,"anchor":"x","title":{"text":"Número de Recuperados","font":{"color":"rgba(0,0,0,1)","family":"","size":14.6118721461187}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":false,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.88976377952756,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.689497716895}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","showSendToCloud":false},"source":"A","attrs":{"1e3032a14c8a":{"x":{},"y":{},"type":"scatter"}},"cur_data":"1e3032a14c8a","visdat":{"1e3032a14c8a":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<pre><code>## `summarise()` has grouped output by &#39;Ano&#39;. You can override using the `.groups` argument.</code></pre>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<pre><code>## `summarise()` has grouped output by &#39;Tipo de Dato&#39;. You can override using the `.groups` argument.</code></pre>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-15-1.png" width="672" /> hagamos zoom a muerte</p>
+<pre><code>## `summarise()` has grouped output by &#39;dia_semana&#39;. You can override using the `.groups` argument.</code></pre>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre><code>## `summarise()` has grouped output by &#39;Ano&#39;. You can override using the `.groups` argument.</code></pre>
+<p><img src="analisis_temporal_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
